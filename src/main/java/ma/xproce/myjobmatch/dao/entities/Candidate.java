@@ -14,52 +14,33 @@ import java.util.List;
 @Table(name = "candidates")
 public class Candidate extends User{
 
-    String fullname;
-    String phone;
-    String linkedinUrl;
-    String website; //List website maybe
-    String location; //country+city
-    String category; //field of expertise
-    String jobType; //contact type : intern, full time, part-time , freelance... (opt)
-    String resumeUrl; //(opt)
-    String coverLetterUrl; //relates to job maybe
-    String status; //(opt) (looking for a job, employed)?
-    String resumeForm; //all inputted cases of resume-form will be also saved in this one attribute for the model of job matching
+    private String fullName;
+    private String phone;
+    private String linkedinUrl;
+    private String website;
+    private String location; //country+city
+    private String category; //field of expertise
+    private String jobType; //contact type : intern, full time, part-time , freelance... (opt)
 
-    //resume form
-    @ElementCollection //Used for mapping simple collections like List<String> in JPA. Each List<String> is mapped to a separate table.
-    @CollectionTable(name = "candidate_education", joinColumns = @JoinColumn(name = "candidate_id"))
-    private List<String> education; // School, duration, degree
+    @Column(nullable = true)
+    private String resumeUrl;
 
-    @ElementCollection
-    @CollectionTable(name = "candidate_experience", joinColumns = @JoinColumn(name = "candidate_id"))
-    private List<String> experience; // hadi ymkn khass tkon entity bo7dha table cause fih company - title - descritption o duraction o jobtype/contrat o location
+    @Column(nullable = true)
+    private String coverLetterUrl;
+    private String status; //(opt) (looking for a job, employed)?
 
-    @ElementCollection
-    @CollectionTable(name = "candidate_soft_skills", joinColumns = @JoinColumn(name = "candidate_id"))
-    private List<String> softSkills;
-
-    @ElementCollection
-    @CollectionTable(name = "candidate_hard_skills", joinColumns = @JoinColumn(name = "candidate_id"))
-    private List<String> hardSkills;
-
-    @ElementCollection
-    @CollectionTable(name = "candidate_languages", joinColumns = @JoinColumn(name = "candidate_id"))
-    private List<String> languages;
-
-    @ElementCollection
-    @CollectionTable(name = "candidate_certifications", joinColumns = @JoinColumn(name = "candidate_id"))
-    private List<String> certifications;
-
-    @ElementCollection
-    @CollectionTable(name = "candidate_projects", joinColumns = @JoinColumn(name = "candidate_id"))
-    private List<String> projects;
+    @Column(nullable = true)
+    private String profilePictureUrl;
 
 
     //list of jobs applied to: filter jobs by candidateApplicationStatus if true(aaplied) or false
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Application> applications;
+
+    @OneToOne
+    @JoinColumn(name = "resume_id")
+    private Resume resume;
 
 
 

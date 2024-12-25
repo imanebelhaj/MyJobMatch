@@ -1,9 +1,9 @@
 package ma.xproce.myjobmatch.dao.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -14,23 +14,29 @@ import lombok.*;
 @Table(name = "rh")
 public class RH extends User{
 
-    //name
-    //profile
-    //contact
-    //creation
-    //company
-    //jobs
-    //position
-
-
-
-
     @Column(nullable = false)
     private String companyName;
 
-    @Column(nullable = true)
-    private String department;
+    @Column(nullable = false)
+    private String fullName;
 
     @Column(nullable = true)
-    private String position;
+    private String linkedinUrl;
+
+    @Column(nullable = true)
+    private String department; //it? business? finance?
+
+    @Column(nullable = true)
+    private String phone;
+
+    @Column(nullable = true)
+    private String companyWebsite;
+
+    @Column(nullable = true)
+    private String profilePictureUrl;
+
+    //list of created jobs
+    @OneToMany(mappedBy = "rh", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<Job> jobs;
 }

@@ -17,15 +17,14 @@ public class Candidate extends User{
     String fullname;
     String phone;
     String linkedinUrl;
-    //String website;
-    List<String> website;
+    String website; //List website maybe
     String location; //country+city
     String category; //field of expertise
-    String jobType; //contact type : intern, full time, part time , freelance... (opt)
+    String jobType; //contact type : intern, full time, part-time , freelance... (opt)
     String resumeUrl; //(opt)
     String coverLetterUrl; //relates to job maybe
     String status; //(opt) (looking for a job, employed)?
-    String resumeForm; //all inputed cases of resume-form will be also saved in this one attribute for the model of job matching
+    String resumeForm; //all inputted cases of resume-form will be also saved in this one attribute for the model of job matching
 
     //resume form
     @ElementCollection //Used for mapping simple collections like List<String> in JPA. Each List<String> is mapped to a separate table.

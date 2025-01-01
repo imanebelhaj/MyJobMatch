@@ -1,53 +1,21 @@
-package ma.xproce.myjobmatch.dao.entities;
+package ma.xproce.myjobmatch.dto;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
-
-@Entity
 //@Getter
 //@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString   //(callSuper = true)
-@Table(name = "rh")
-public class RH extends User{
-
-
-    //@Column(nullable = false)
+@Data
+public class RhProfileDto {
     private String companyName;
-
-    //@Column(nullable = false)
     private String fullName;
-
-
-    @Column(nullable = true)
     private String linkedinUrl;
-
-
-    @Column(nullable = true)
-    private String department; //it? business? finance?
-
-
-    @Column(nullable = true)
+    private String department;
     private String phone;
-
-
-    @Column(nullable = true)
     private String companyWebsite;
-
-    @Column(nullable = true)
     private String profilePictureUrl;
-
-    @Column(nullable = false)
-    private boolean isProfileComplete = false;
-
-    //list of created jobs
-    @OneToMany(mappedBy = "rh", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    private List<Job> jobs;
-
+    private boolean isProfileComplete;
 
     public String getCompanyName() {
         return companyName;
@@ -113,13 +81,6 @@ public class RH extends User{
         isProfileComplete = profileComplete;
     }
 
-    public List<Job> getJobs() {
-        return jobs;
-    }
-
-    public void setJobs(List<Job> jobs) {
-        this.jobs = jobs;
-    }
 
 
 }

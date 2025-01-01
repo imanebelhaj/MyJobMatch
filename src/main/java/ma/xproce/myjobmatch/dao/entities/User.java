@@ -16,7 +16,7 @@ import java.util.Date;
 @ToString
 @Table(name="users")
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,6 +33,9 @@ public class User {
 
     private Date createdAt;
     private Date editedAt;
+
+    @Column(nullable = false)
+    private boolean isProfileComplete = false;
 
 //    @Column(name = "verification_code")
 //    private String verificationCode;

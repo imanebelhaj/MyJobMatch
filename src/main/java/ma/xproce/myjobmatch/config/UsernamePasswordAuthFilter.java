@@ -4,8 +4,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import ma.xproce.myjobmatch.dao.entities.RH;
+import ma.xproce.myjobmatch.dao.repositories.RHRepository;
 import ma.xproce.myjobmatch.utils.CustomUserDetailsService;
 import ma.xproce.myjobmatch.utils.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,13 +26,17 @@ public class UsernamePasswordAuthFilter  extends UsernamePasswordAuthenticationF
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService customUserDetailsService;
+    //@Autowired
+    private final RHRepository rhRepository;
+
 
     public UsernamePasswordAuthFilter(AuthenticationManager authenticationManager,
-                                                JwtUtil jwtUtil,
-                                                CustomUserDetailsService customUserDetailsService) {
+                                      JwtUtil jwtUtil,
+                                      CustomUserDetailsService customUserDetailsService, RHRepository rhRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.customUserDetailsService = customUserDetailsService;
+        this.rhRepository = rhRepository;
         setFilterProcessesUrl("/api/auth/login"); // URL for the login endpoint
     }
     @Override
@@ -56,6 +63,21 @@ public class UsernamePasswordAuthFilter  extends UsernamePasswordAuthenticationF
 
         // Optionally, send additional information in the response
         response.getWriter().write("{\"token\": \"" + jwt + "\"}");
+
+        //Check if the authenticated user is an RH and whether their profile is complete
+        if (userDetails instanceof RH) {
+            RH rh = (RH) userDetails;
+            RH rhFromDb = rhRepository.findByUsername(rh.getUsername())
+                    .orElseThrow(() -> new RuntimeException("RH not found"));
+
+            // If the profile is not complete, redirect to the profile completion page
+            if (!rhFromDb.isProfileComplete()) {
+                response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
+                response.setHeader("Location", "/api/rh/complete-profile");
+                return;
+            }
+        }
+        //we gotta do the same ofor candidate wlkn maert asln wach khdmat dyl rh
     }
 
     @Override

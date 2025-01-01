@@ -1,6 +1,8 @@
 package ma.xproce.myjobmatch.utils;
 
 import lombok.Getter;
+import ma.xproce.myjobmatch.dao.entities.Candidate;
+import ma.xproce.myjobmatch.dao.entities.RH;
 import ma.xproce.myjobmatch.dao.entities.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +18,13 @@ public class CustomUserDetails implements UserDetails {
 
     public CustomUserDetails(User user) {
         this.user = user;
+    }
+
+    public RH getRh() {
+        if (user.getRole().getRole().equals("RH")) {
+            return (RH) user; // Cast to RH if the user is an instance of RH
+        }
+        throw new ClassCastException("User is not of type RH");
     }
 
 

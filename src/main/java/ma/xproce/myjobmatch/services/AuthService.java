@@ -62,7 +62,10 @@ public class AuthService {
         if (role == null) {
             throw new RuntimeException("Role not found: " + registerUserDto.getRole());
         }
+
         user.setRole(role);
+
+        System.out.println(user.getRole().toString());
 
         // Save and return the user
         return userRepository.save(user);

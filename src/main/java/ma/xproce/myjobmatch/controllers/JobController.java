@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class JobController {
     //get all created but this specific rh
     //add
-    // edit ( state == created )
+    // edit ( state == created ) --> diri hna service lahfdek o hydi dik rwina 🚩
     // delete
     //job details
     //applications per job ( state == inactive )
@@ -75,43 +75,105 @@ public class JobController {
 
     // Get job by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Job> getJobById(@PathVariable("id") Long id) {
-        Optional<Job> job = jobRepository.findById(id);
-        if (job.isPresent()) {
-            return new ResponseEntity<>(job.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Job not found
+    public ResponseEntity<JobDto> getJobById(@PathVariable Long id, Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        RH rh = customUserDetails.getRh();
+
+        Job job = jobRepository.findByIdAndRh(id, rh);  // assuming there's a method in JobRepository to find job by ID and RH
+        if (job == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        JobDto jobDto = new JobDto(job);
+        return new ResponseEntity<>(jobDto, HttpStatus.OK);
     }
 
 
 
     // Update an existing job
-    @PutMapping("/{id}")
-    public ResponseEntity<Job> updateJob(@PathVariable("id") Long id, @RequestBody Job jobDetails) {
-        Optional<Job> existingJob = jobRepository.findById(id);
-        if (existingJob.isPresent()) {
-            Job job = existingJob.get();
-            job.setTitle(jobDetails.getTitle());
-            job.setDescription(jobDetails.getDescription());
-            job.setLocation(jobDetails.getLocation());
-            // Add other fields to update
+    @PutMapping("/update/{id}")
+    public ResponseEntity<JobDto> updateJob(@PathVariable Long id, @RequestBody Job job, Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        RH rh = customUserDetails.getRh();
 
-            Job updatedJob = jobRepository.save(job);
-            return new ResponseEntity<>(updatedJob, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Job not found
+        Job existingJob = jobRepository.findByIdAndRh(id, rh); // Find the job by ID and RH
+        if (existingJob == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        if (!"Created".equals(existingJob.getStatus())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // Only allow update if status is "Created"
+        }
+
+        // Update job fields as needed
+        existingJob.setTitle(job.getTitle());
+        existingJob.setCategory(job.getCategory());
+        existingJob.setDescription(job.getDescription());
+        existingJob.setLocation(job.getLocation());
+        existingJob.setApplicationDeadline(job.getApplicationDeadline());
+        existingJob.setMaxApplications(job.getMaxApplications());
+        existingJob.setJobType(job.getJobType());
+        existingJob.setSalaryRange(job.getSalaryRange());
+        existingJob.setRequiredEducation(job.getRequiredEducation());
+        existingJob.setRequiredExperience(job.getRequiredExperience());
+        existingJob.setJobLevel(job.getJobLevel());
+        existingJob.setRequiredSkills(job.getRequiredSkills());
+        existingJob.setStatus(job.getStatus());
+
+        Job updatedJob = jobRepository.save(existingJob); // Save the updated job
+        JobDto jobDto = new JobDto(updatedJob);
+        return new ResponseEntity<>(jobDto, HttpStatus.OK);
+    }
+    @PutMapping(value = "/post/{id}")
+    public ResponseEntity<JobDto> postJob(@PathVariable Long id, Authentication authentication) {
+      //  try {
+            // Retrieve the authenticated RH from the current session
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            RH rh = customUserDetails.getRh();
+
+            // Retrieve the job by its ID
+            Job job = jobRepository.findByIdAndRh(id, rh); // Find the job by ID and RH
+            if (job == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+
+            // Check if the job is in "Created" status before changing it to "Posted"
+            if ("Created".equals(job.getStatus())) {
+                // Change the status to "Posted"
+                job.setStatus("Posted");
+
+                // Save the updated job to the database
+                Job updatedJob = jobRepository.save(job);
+
+                // Convert the updated job to JobDto
+                JobDto jobDTO = new JobDto(updatedJob);
+
+                return new ResponseEntity<>(jobDTO, HttpStatus.OK);
+            } else {
+                // Return a bad request if the job status is not "Created"
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }
+   //     } catch (Exception e) {
+   //         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+   //     }
     }
 
     // Delete a job
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteJob(@PathVariable("id") Long id) {
-        try {
-            jobRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Job deleted
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // Error deleting job
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<HttpStatus> deleteJob(@PathVariable Long id, Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        RH rh = customUserDetails.getRh();
+
+        Job job = jobRepository.findByIdAndRh(id, rh); // Find the job by ID and RH
+        if (job == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        jobRepository.delete(job); // Delete the job
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+
+
+
 }

@@ -32,6 +32,8 @@ public class Candidate extends User{
     @Column(nullable = true)
     private String profilePictureUrl;
 
+    @Column(nullable = false)
+    private boolean isProfileComplete = false;
 
     //list of jobs applied to: filter jobs by candidateApplicationStatus if true(aaplied) or false
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL)
@@ -41,6 +43,14 @@ public class Candidate extends User{
     @OneToOne
     @JoinColumn(name = "resume_id")
     private Resume resume;
+
+    public boolean isProfileComplete() {
+        return isProfileComplete;
+    }
+
+    public void setProfileComplete(boolean profileComplete) {
+        isProfileComplete = profileComplete;
+    }
 
 
 

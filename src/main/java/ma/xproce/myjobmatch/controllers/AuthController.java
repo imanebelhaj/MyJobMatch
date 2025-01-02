@@ -26,12 +26,10 @@ public class AuthController {
     private AuthService authService;
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private RHRepository rhRepository;
     @Autowired
     private CandidateRepository candidateRepository;
-
     @Autowired
     private JwtUtil jwtUtil;
 

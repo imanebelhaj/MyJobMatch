@@ -49,6 +49,13 @@ public class RH extends User{
     private List<Job> jobs;
 
 
+
+
+
+
+
+
+    //ggeters setters
     public String getCompanyName() {
         return companyName;
     }

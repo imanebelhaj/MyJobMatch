@@ -44,10 +44,13 @@ public class User {
 //    private LocalDateTime verificationCodeExpiresAt;
 //    private boolean enabled;
 
-    @ManyToOne
+    @ManyToOne //(fetch = FetchType.EAGER) //@Fetch(FetchMode.JOIN)
     @JoinColumn(name = "role", nullable = false)
     @ToString.Exclude
     private Roles role;
+
+
+
 
     // Getters and Setters
     public Long getId() {

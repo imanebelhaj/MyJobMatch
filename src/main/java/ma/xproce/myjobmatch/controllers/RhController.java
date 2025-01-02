@@ -30,12 +30,6 @@ public class RhController {
     private RHRepository rhRepository;
     @PutMapping("/complete-profile")
     public ResponseEntity<String> completeProfile(@RequestBody RhProfileDto rhProfileDTO, Authentication authentication) {
-//         RH rh = (RH) authentication.getPrincipal();
-//        if (rh == null) {
-//            String username = authentication.getName();  // Fallback to using username from Authentication
-//            rh = rhRepository.findByUsername(username)
-//                    .orElseThrow(() -> new RuntimeException("RH not found"));
-//        }
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         RH rh = customUserDetails.getRh();
 

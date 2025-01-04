@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -28,6 +29,11 @@ public class JobService {
     public Job getJobById(Long jobId) {
         return jobRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found with ID: " + jobId));
+    }
+
+    public List<Job> getAllJobs(){
+        List<Job> jobs = jobRepository.findAll();
+        return jobs;
     }
 
 //    public JobDto getJobById(Long id){

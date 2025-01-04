@@ -63,24 +63,6 @@ public class JobDto {
 
     @JsonProperty("rhName")
     private String rhName;
-//    private Long id;
-//    private String title;
-//    private String category;
-//    private String description;
-//    private String location;
-//    //private Date createdAt;
-//    //private Date editedAt;
-//    private Date applicationDeadline;
-//    private Date postedAt;
-//    private int maxApplications;
-//    private String status;
-//    private String jobType;
-//    private String salaryRange;
-//    private String requiredEducation;
-//    private String requiredExperience;
-//    private String jobLevel;
-//    private List<String> requiredSkills;
-//    private String rhName;
 
     public JobDto(Job job) {
         this.id = job.getId();

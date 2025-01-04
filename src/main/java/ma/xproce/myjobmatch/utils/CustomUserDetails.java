@@ -21,10 +21,19 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public RH getRh() {
-        if (user.getRole().getRole().equals("RH")) {
+       // if (user.getRole().getRole().equals("RH")) {
+        if (user instanceof RH) {
             return (RH) user; // Cast to RH if the user is an instance of RH
         }
         throw new ClassCastException("User is not of type RH");
+    }
+
+    public Candidate getCandidate() {
+        // if (user.getRole().getRole().equals("RH")) {
+        if (user instanceof Candidate) {
+            return (Candidate) user; // Cast to RH if the user is an instance of RH
+        }
+        throw new ClassCastException("User is not of type Candidate");
     }
 
 

@@ -1,12 +1,15 @@
 package ma.xproce.myjobmatch.dto;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import ma.xproce.myjobmatch.dao.entities.RH;
+
+import java.util.List;
 
 //@Getter
 //@Setter
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RhProfileDto {
     private String companyName;
     private String fullName;
@@ -16,6 +19,22 @@ public class RhProfileDto {
     private String companyWebsite;
     private String profilePictureUrl;
     private boolean isProfileComplete;
+  //  private int jobCount;
+
+//    public RhProfileDto(RH rh) {
+//        this.companyName = rh.getCompanyName();
+//        this.fullName = rh.getFullName();
+//        this.linkedinUrl = rh.getLinkedinUrl();
+//        this.department = rh.getDepartment();
+//        this.phone = rh.getPhone();
+//        this.companyWebsite = rh.getCompanyWebsite();
+//        this.profilePictureUrl = rh.getProfilePictureUrl();
+//        this.isProfileComplete = rh.isProfileComplete();
+//        this.jobCount = (rh.getJobs() != null) ? rh.getJobs().size() : 0;
+//    }
+
+
+
 
     public String getCompanyName() {
         return companyName;

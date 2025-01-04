@@ -11,4 +11,6 @@ import java.util.List;
 public interface JobRepository extends JpaRepository<Job,Long> {
     List<Job> findByRh(RH rh);
     Job findByIdAndRh(Long id, RH rh);
+
+    Job getJobById(Long id);
 }

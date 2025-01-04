@@ -4,6 +4,7 @@ package ma.xproce.myjobmatch.controllers;
 import ma.xproce.myjobmatch.dao.entities.RH;
 import ma.xproce.myjobmatch.dao.repositories.RHRepository;
 import ma.xproce.myjobmatch.dto.RhProfileDto;
+import ma.xproce.myjobmatch.services.RhService;
 import ma.xproce.myjobmatch.utils.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,16 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/rh")
 @PreAuthorize("hasAuthority('RH')")
 public class RhController {
-    //add job post
-    //edit job post
-    //publish the job post -> change state from created(can still edit or delete it) to publihed/posted(cant edit it + can still delete)
-    //job post automatically change state to finished or idk -> when max candidate or deadline are reached (cant edit or delete)
-    //view profile rh
-    //profile form after register and first login : for comapny names etc
-    //dashboard for each job and list of candidate appkied to it
+
+
 
     @Autowired
     private RHRepository rhRepository;
+    @Autowired
+    private RhService rhService;
     @PutMapping("/complete-profile")
     public ResponseEntity<String> completeProfile(@RequestBody RhProfileDto rhProfileDTO, Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -41,9 +39,44 @@ public class RhController {
         rh.setCompanyWebsite(rhProfileDTO.getCompanyWebsite());
         rh.setProfilePictureUrl(rhProfileDTO.getProfilePictureUrl());
         rh.setProfileComplete(true);
-
         rhRepository.save(rh);
         return ResponseEntity.ok("Profile updated successfully");
+    }
+
+
+    @RequestMapping("/view-profile")
+    public ResponseEntity<RhProfileDto> viewProfile(Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long rhId = customUserDetails.getRh().getId();
+
+        RhProfileDto rhProfileDto = rhService.getProfileById(rhId);
+
+        return ResponseEntity.ok(rhProfileDto);
+    }
+
+    @PutMapping("/edit-profile")
+    public ResponseEntity<String> editProfile(@RequestBody RhProfileDto rhProfileDto, Authentication authentication) {
+        // Get the authenticated RH ID from CustomUserDetails
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long rhId = customUserDetails.getRh().getId();
+
+        // Delegate the update logic to the RhService
+        rhService.updateProfile(rhId, rhProfileDto);
+
+        return ResponseEntity.ok("Profile edited successfully");
+    }
+
+
+    // Delete Account Method
+    @RequestMapping("/delete-account")
+    public ResponseEntity<String> deleteAccount(Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        RH rh = customUserDetails.getRh();
+
+        // Delete the authenticated user's account
+        rhRepository.delete(rh);
+
+        return ResponseEntity.ok("Account deleted successfully");
     }
 
 

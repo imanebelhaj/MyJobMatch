@@ -75,7 +75,6 @@ public class ApplicationController {
     @PreAuthorize("hasAuthority('RH')")
     public ResponseEntity<List<ApplicationDto>> getApplicationsByJob(@PathVariable Long jobId,Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        //RH rh = customUserDetails.getRh();
         List<Application> applications = applicationService.getApplicationsByJob(jobId);
 
         List<ApplicationDto> ApplicationDto = applications.stream()

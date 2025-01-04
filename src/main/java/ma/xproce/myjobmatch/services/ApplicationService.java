@@ -15,13 +15,16 @@ public class ApplicationService {
     @Autowired
     private ApplicationRepository applicationRepository;
 
-//    public Application createApplication(Candidate candidate, Job job) {
-//        Application application = new Application(candidate, job);
-//        return applicationRepository.save(application);
-//    }
 
   //   Create Application (Candidate applies for a job)
     public Application createApplication(Candidate candidate, Job job) {
+
+        // If an existing application is found, throw an exception or return a specific result
+        Application existingApplication = applicationRepository.findByCandidateAndJob(candidate, job);
+        if (existingApplication != null) {
+            System.out.println("💗💗💗💗💗💗");// just for testing
+            throw new IllegalArgumentException("You have already applied to this job.");
+        }
         Application application = new Application();
         application.setCandidate(candidate);
         application.setJob(job);
@@ -35,8 +38,8 @@ public class ApplicationService {
     }
 
     // Get Applications by Candidate ID
-    public List<Application> getApplicationsByCandidate(Long candidateId) {
-        return applicationRepository.findByCandidateId(candidateId);
+    public List<Application> getApplicationsByCandidate(Candidate candidate) {
+        return applicationRepository.findByCandidate(candidate);
     }
 
     // Get Applications by Job ID

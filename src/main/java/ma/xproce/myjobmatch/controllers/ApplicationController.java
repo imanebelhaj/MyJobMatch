@@ -4,6 +4,7 @@ package ma.xproce.myjobmatch.controllers;
 import ma.xproce.myjobmatch.dao.entities.Application;
 import ma.xproce.myjobmatch.dao.entities.Candidate;
 import ma.xproce.myjobmatch.dao.entities.Job;
+import ma.xproce.myjobmatch.dao.entities.RH;
 import ma.xproce.myjobmatch.dto.ApplicationDto;
 import ma.xproce.myjobmatch.dto.JobDto;
 import ma.xproce.myjobmatch.services.ApplicationService;
@@ -15,9 +16,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -33,20 +36,8 @@ public class ApplicationController {
     @Autowired
     private JobService jobService;
 
-//    @PostMapping("/candidate/apply/{jobId}")
-//    @PreAuthorize("hasAuthority('CANDIDATE')")
-//    public ResponseEntity<Application> applyForJob(@PathVariable Long jobId, Authentication authentication) {
-//        // Get the authenticated candidate
-//        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-//        Candidate candidate = customUserDetails.getCandidate();
-//        // Find the Job by ID
-//        Job job = jobService.getJobById(jobId);
-//        // Create the application
-//        Application application = applicationService.createApplication(candidate, job);
-//        return ResponseEntity.ok(application);
-//    }
 
-        @PostMapping("/candidate/apply/{jobId}")
+    @PostMapping("/candidate/apply/{jobId}")
     @PreAuthorize("hasAuthority('CANDIDATE')")
     public ResponseEntity<ApplicationDto> applyForJob(@PathVariable Long jobId,Authentication authentication) {
         // Get the authenticated candidate
@@ -64,19 +55,33 @@ public class ApplicationController {
 
 
     // 2. Get Applications by Candidate ID
-    @GetMapping("/candidate/{candidateId}")
+    @GetMapping("/candidate")
     @PreAuthorize("hasAuthority('CANDIDATE')")
-    public ResponseEntity<List<Application>> getApplicationsByCandidate(@PathVariable Long candidateId,Authentication authentication) {
-        List<Application> applications = applicationService.getApplicationsByCandidate(candidateId);
-        return ResponseEntity.ok(applications);
+    @Transactional
+    public ResponseEntity<List<ApplicationDto>> getApplicationsByCandidate(Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        Candidate candidate = customUserDetails.getCandidate();
+        List<Application> applications = applicationService.getApplicationsByCandidate(candidate);
+        //List<Application> applications = candidate.getApplications();
+
+        List<ApplicationDto> ApplicationDto = applications.stream()
+                .map(ma.xproce.myjobmatch.dto.ApplicationDto::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApplicationDto);
     }
 
     // 3. Get Applications by Job ID
     @GetMapping("/rh/{jobId}")
     @PreAuthorize("hasAuthority('RH')")
-    public ResponseEntity<List<Application>> getApplicationsByJob(@PathVariable Long jobId) {
+    public ResponseEntity<List<ApplicationDto>> getApplicationsByJob(@PathVariable Long jobId,Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        //RH rh = customUserDetails.getRh();
         List<Application> applications = applicationService.getApplicationsByJob(jobId);
-        return ResponseEntity.ok(applications);
+
+        List<ApplicationDto> ApplicationDto = applications.stream()
+                .map(ma.xproce.myjobmatch.dto.ApplicationDto::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApplicationDto);
     }
 
 

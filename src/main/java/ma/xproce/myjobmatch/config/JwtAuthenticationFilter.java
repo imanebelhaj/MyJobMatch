@@ -8,7 +8,7 @@ import lombok.NonNull;
 import ma.xproce.myjobmatch.dao.repositories.TokenBlacklistRepository;
 import ma.xproce.myjobmatch.utils.CustomUserDetailsService;
 import ma.xproce.myjobmatch.utils.JwtUtil;
-import org.hibernate.validator.constraints.CodePointLength;
+//import org.hibernate.validator.constraints.CodePointLength;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,8 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-
-
         try {
             String token = extractTokenFromRequest(request);
 

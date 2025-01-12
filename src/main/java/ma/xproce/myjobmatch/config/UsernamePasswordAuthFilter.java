@@ -61,6 +61,8 @@ public class UsernamePasswordAuthFilter  extends UsernamePasswordAuthenticationF
         response.setHeader("Authorization", "Bearer " + jwt);
         response.setStatus(HttpStatus.OK.value());
 
+        response.setContentType("application/json");
+
         // Optionally, send additional information in the response
         response.getWriter().write("{\"token\": \"" + jwt + "\"}");
 
@@ -73,11 +75,11 @@ public class UsernamePasswordAuthFilter  extends UsernamePasswordAuthenticationF
             // If the profile is not complete, redirect to the profile completion page
             if (!rhFromDb.isProfileComplete()) {
                 response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
-                response.setHeader("Location", "/api/rh/complete-profile");
+                response.setHeader("Location", "/api/rh/complete-profile");  // Adjust the redirect URL if needed
                 return;
             }
         }
-        //we gotta do the same ofor candidate wlkn maert asln wach khdmat dyl rh
+        chain.doFilter(request, response);
     }
 
     @Override

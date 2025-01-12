@@ -49,6 +49,7 @@ public class JobRhController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    //all jobs by rh
     @GetMapping("/all")
     public ResponseEntity<List<JobDto>> getAllJobs(Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();

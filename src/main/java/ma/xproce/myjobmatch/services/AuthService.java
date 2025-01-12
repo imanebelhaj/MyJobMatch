@@ -1,14 +1,13 @@
 package ma.xproce.myjobmatch.services;
 
 
-import ma.xproce.myjobmatch.dao.entities.Roles;
-import ma.xproce.myjobmatch.dao.entities.TokenBlacklist;
-import ma.xproce.myjobmatch.dao.entities.User;
+import ma.xproce.myjobmatch.dao.entities.*;
 import ma.xproce.myjobmatch.dao.repositories.RolesRepository;
 import ma.xproce.myjobmatch.dao.repositories.TokenBlacklistRepository;
 import ma.xproce.myjobmatch.dao.repositories.UserRepository;
 import ma.xproce.myjobmatch.dto.LoginUserDto;
 import ma.xproce.myjobmatch.dto.RegisterUserDto;
+import ma.xproce.myjobmatch.utils.CustomUserDetails;
 import ma.xproce.myjobmatch.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,7 +42,6 @@ public class AuthService {
     private JwtUtil jwtUtil;
     @Autowired
     private TokenBlacklistRepository tokenBlacklistRepository;
-
 
 
     public User register(RegisterUserDto registerUserDto) {
@@ -84,6 +82,17 @@ public class AuthService {
         // Clear security context
         SecurityContextHolder.clearContext();
     }
+    public boolean isProfileComplete(CustomUserDetails customUserDetails) {
+        if (customUserDetails.getRh() != null) {
+            RH rh = customUserDetails.getRh();
+            return rh.getCompanyName() != null && !rh.getCompanyName().isEmpty();
+        } else if (customUserDetails.getCandidate() != null) {
+            Candidate candidate = customUserDetails.getCandidate();
+            return candidate.getEmail() != null && !candidate.getEmail().isEmpty();
+        }
+        return false;
+    }
+
 
 
 
@@ -105,6 +114,7 @@ public class AuthService {
 //            throw new RuntimeException("Invalid credentials.");
 //        }
 //    }
+
 
 
 }

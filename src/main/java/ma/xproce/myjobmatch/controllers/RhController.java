@@ -7,6 +7,7 @@ import ma.xproce.myjobmatch.dto.RhProfileDto;
 import ma.xproce.myjobmatch.services.RhService;
 import ma.xproce.myjobmatch.utils.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/rh")
@@ -27,10 +31,10 @@ public class RhController {
     @Autowired
     private RhService rhService;
     @PutMapping("/complete-profile")
-    public ResponseEntity<String> completeProfile(@RequestBody RhProfileDto rhProfileDTO, Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> completeProfile(@RequestBody RhProfileDto rhProfileDTO, Authentication authentication) {
+        try {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         RH rh = customUserDetails.getRh();
-
         rh.setCompanyName(rhProfileDTO.getCompanyName());
         rh.setFullName(rhProfileDTO.getFullName());
         rh.setLinkedinUrl(rhProfileDTO.getLinkedinUrl());
@@ -40,7 +44,17 @@ public class RhController {
         rh.setProfilePictureUrl(rhProfileDTO.getProfilePictureUrl());
         rh.setProfileComplete(true);
         rhRepository.save(rh);
-        return ResponseEntity.ok("Profile updated successfully");
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Profile completed successfully");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            // Return error message in case of exception
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Error: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
 

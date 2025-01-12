@@ -1,12 +1,14 @@
 package ma.xproce.myjobmatch.controllers;
 import ma.xproce.myjobmatch.dao.entities.Candidate;
 import ma.xproce.myjobmatch.dao.entities.RH;
+import ma.xproce.myjobmatch.dao.entities.Roles;
 import ma.xproce.myjobmatch.dao.entities.User;
 import ma.xproce.myjobmatch.dao.repositories.CandidateRepository;
 import ma.xproce.myjobmatch.dao.repositories.RHRepository;
 import ma.xproce.myjobmatch.dto.LoginUserDto;
 import ma.xproce.myjobmatch.dto.RegisterUserDto;
 import ma.xproce.myjobmatch.services.AuthService;
+import ma.xproce.myjobmatch.utils.CustomUserDetails;
 import ma.xproce.myjobmatch.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,44 +38,88 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+//    @PostMapping("/register")
+//    public ResponseEntity<String> register(@RequestBody RegisterUserDto registerUserDto) {
+//        try {
+//            User newUser = authService.register(registerUserDto);
+//
+//            if (newUser.getRole().getRole().equals("RH")) {
+//                RH rh = new RH();
+//                rh.setUsername(newUser.getUsername()); // Ensure the username is the same as the user
+//                rh.setRole(newUser.getRole()); // Set role as RH
+//                rh.setEmail(newUser.getEmail());
+//                rh.setPassword(newUser.getPassword());
+//                rh.setCreatedAt(new Date());
+//                rh.setProfileComplete(false); // Initially, profile isn't complete
+//
+//                // Save the RH entity to the RH table
+//                rhRepository.save(rh);
+//            }
+//            if (newUser.getRole().getRole().equals("CANDIDATE")) {
+//                Candidate candidate = new Candidate();
+//                candidate.setUsername(newUser.getUsername()); // Ensure the username is the same as the user
+//                candidate.setRole(newUser.getRole()); // Set role as RH
+//                candidate.setEmail(newUser.getEmail());
+//                candidate.setPassword(newUser.getPassword());
+//                candidate.setCreatedAt(new Date());
+//                candidate.setProfileComplete(false); // Initially, profile isn't complete
+//
+//                // Save the RH entity to the RH table
+//                candidateRepository.save(candidate);
+//            }
+//            return new ResponseEntity<>("User registered successfully: " + newUser.getUsername(), HttpStatus.CREATED);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+//        }
+//    }
+
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterUserDto registerUserDto) {
         try {
             User newUser = authService.register(registerUserDto);
 
+            // Check if the role is RH (Recruiter)
             if (newUser.getRole().getRole().equals("RH")) {
                 RH rh = new RH();
-                rh.setUsername(newUser.getUsername()); // Ensure the username is the same as the user
-                rh.setRole(newUser.getRole()); // Set role as RH
+                rh.setUsername(newUser.getUsername());
+                rh.setRole(newUser.getRole());
                 rh.setEmail(newUser.getEmail());
                 rh.setPassword(newUser.getPassword());
                 rh.setCreatedAt(new Date());
-                rh.setProfileComplete(false); // Initially, profile isn't complete
-
-                // Save the RH entity to the RH table
+                rh.setProfileComplete(false);
                 rhRepository.save(rh);
             }
+
+            // Check if the role is CANDIDATE (Job Seeker)
             if (newUser.getRole().getRole().equals("CANDIDATE")) {
                 Candidate candidate = new Candidate();
-                candidate.setUsername(newUser.getUsername()); // Ensure the username is the same as the user
-                candidate.setRole(newUser.getRole()); // Set role as RH
+                candidate.setUsername(newUser.getUsername());
+                candidate.setRole(newUser.getRole());
                 candidate.setEmail(newUser.getEmail());
                 candidate.setPassword(newUser.getPassword());
                 candidate.setCreatedAt(new Date());
-                candidate.setProfileComplete(false); // Initially, profile isn't complete
-
-                // Save the RH entity to the RH table
+                candidate.setProfileComplete(false);
                 candidateRepository.save(candidate);
             }
-            return new ResponseEntity<>("User registered successfully: " + newUser.getUsername(), HttpStatus.CREATED);
+
+            // Return a JSON response with success message and user data
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "User registered successfully");
+            response.put("username", newUser.getUsername());
+            response.put("role", newUser.getRole().getRole());
+
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+
         } catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            // Return error message in case of exception
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Error: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
-
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginUserDto loginUserDto) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginUserDto loginUserDto) {
         try {
             // Authenticate the user based on username and password
             Authentication authentication = authenticationManager.authenticate(
@@ -78,17 +127,72 @@ public class AuthController {
             );
 
             // Extract UserDetails from the Authentication object
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            //UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            // Get user role (RH or Candidate)
+            RH rh = null;
+            Candidate candidate = null;
+
+            // Handle user roles dynamically
+            if (customUserDetails.getRh() != null) {
+                rh = customUserDetails.getRh();
+            } else if (customUserDetails.getCandidate() != null) {
+                candidate = customUserDetails.getCandidate();
+            }
 
             // Generate the JWT token using the UserDetails
-            String token = jwtUtil.generateToken(userDetails);
+            String token = jwtUtil.generateToken(customUserDetails);
 
-            // Return the JWT token as part of the response
-            return ResponseEntity.ok("Bearer " + token);
+            // Return the JWT token as part of a structured JSON response
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Login successful");
+            response.put("token", "Bearer " + token);
+            response.put("username", customUserDetails.getUsername());
+            //response.put("roles", customUserDetails.getAuthorities());
+
+            if (rh != null) {
+                response.put("role", "RH");
+            } else if (candidate != null) {
+                response.put("role", "Candidate");
+            }
+
+            // Profile completion status (this can be added to the response as per your logic)
+            boolean profileComplete = authService.isProfileComplete(customUserDetails);
+            response.put("profileComplete", profileComplete);
+
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
+            // Return error message in case of exception
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Error: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
     }
+
+
+
+//    @PostMapping("/login")
+//    public ResponseEntity<String> login(@RequestBody LoginUserDto loginUserDto) {
+//        try {
+//            // Authenticate the user based on username and password
+//            Authentication authentication = authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(loginUserDto.getUsername(), loginUserDto.getPassword())
+//            );
+//
+//            // Extract UserDetails from the Authentication object
+//            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//
+//            // Generate the JWT token using the UserDetails
+//            String token = jwtUtil.generateToken(userDetails);
+//
+//            // Return the JWT token as part of the response
+//            return ResponseEntity.ok("Bearer " + token);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
+//        }
+//    }
 
 
 

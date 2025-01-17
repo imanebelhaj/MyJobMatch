@@ -11,6 +11,7 @@ import ma.xproce.myjobmatch.dto.RhProfileDto;
 import ma.xproce.myjobmatch.services.CandidateService;
 import ma.xproce.myjobmatch.utils.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/candidate")
@@ -37,7 +41,8 @@ public class CandidateController {
     //loading page : when cv screening + when job matching model applied
 
     @PutMapping("/complete-profile")
-    public ResponseEntity<String> completeProfile(@RequestBody CandidateProfileDto candidateProfileDto, Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> completeProfile(@RequestBody CandidateProfileDto candidateProfileDto, Authentication authentication) {
+        try {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         Candidate candidate = customUserDetails.getCandidate();
 
@@ -78,7 +83,16 @@ public class CandidateController {
         // Save the updated candidate (with the resume)
         candidateRepository.save(candidate);
 
-        return ResponseEntity.ok("Profile updated successfully");
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Profile completed successfully");
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            // Return error message in case of exception
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Error: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @RequestMapping("/view-profile")

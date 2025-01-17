@@ -29,6 +29,8 @@ public class RhService {
 
         RhProfileDto rhProfileDto = new RhProfileDto();
         rhProfileDto.setCompanyName(rh.getCompanyName());
+        rhProfileDto.setUsername(rh.getUsername());
+        rhProfileDto.setEmail(rh.getEmail());
         rhProfileDto.setFullName(rh.getFullName());
         rhProfileDto.setLinkedinUrl(rh.getLinkedinUrl());
         rhProfileDto.setDepartment(rh.getDepartment());

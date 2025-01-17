@@ -38,41 +38,6 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-//    @PostMapping("/register")
-//    public ResponseEntity<String> register(@RequestBody RegisterUserDto registerUserDto) {
-//        try {
-//            User newUser = authService.register(registerUserDto);
-//
-//            if (newUser.getRole().getRole().equals("RH")) {
-//                RH rh = new RH();
-//                rh.setUsername(newUser.getUsername()); // Ensure the username is the same as the user
-//                rh.setRole(newUser.getRole()); // Set role as RH
-//                rh.setEmail(newUser.getEmail());
-//                rh.setPassword(newUser.getPassword());
-//                rh.setCreatedAt(new Date());
-//                rh.setProfileComplete(false); // Initially, profile isn't complete
-//
-//                // Save the RH entity to the RH table
-//                rhRepository.save(rh);
-//            }
-//            if (newUser.getRole().getRole().equals("CANDIDATE")) {
-//                Candidate candidate = new Candidate();
-//                candidate.setUsername(newUser.getUsername()); // Ensure the username is the same as the user
-//                candidate.setRole(newUser.getRole()); // Set role as RH
-//                candidate.setEmail(newUser.getEmail());
-//                candidate.setPassword(newUser.getPassword());
-//                candidate.setCreatedAt(new Date());
-//                candidate.setProfileComplete(false); // Initially, profile isn't complete
-//
-//                // Save the RH entity to the RH table
-//                candidateRepository.save(candidate);
-//            }
-//            return new ResponseEntity<>("User registered successfully: " + newUser.getUsername(), HttpStatus.CREATED);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterUserDto registerUserDto) {
         try {
@@ -98,7 +63,7 @@ public class AuthController {
                 candidate.setEmail(newUser.getEmail());
                 candidate.setPassword(newUser.getPassword());
                 candidate.setCreatedAt(new Date());
-                candidate.setProfileComplete(false);
+                //candidate.setProfileComplete(false);
                 candidateRepository.save(candidate);
             }
 
@@ -126,8 +91,6 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(loginUserDto.getUsername(), loginUserDto.getPassword())
             );
 
-            // Extract UserDetails from the Authentication object
-            //UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
             // Get user role (RH or Candidate)
@@ -154,7 +117,7 @@ public class AuthController {
             if (rh != null) {
                 response.put("role", "RH");
             } else if (candidate != null) {
-                response.put("role", "Candidate");
+                response.put("role", "CANDIDATE");
             }
 
             // Profile completion status (this can be added to the response as per your logic)
@@ -173,37 +136,19 @@ public class AuthController {
 
 
 
-//    @PostMapping("/login")
-//    public ResponseEntity<String> login(@RequestBody LoginUserDto loginUserDto) {
-//        try {
-//            // Authenticate the user based on username and password
-//            Authentication authentication = authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(loginUserDto.getUsername(), loginUserDto.getPassword())
-//            );
-//
-//            // Extract UserDetails from the Authentication object
-//            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-//
-//            // Generate the JWT token using the UserDetails
-//            String token = jwtUtil.generateToken(userDetails);
-//
-//            // Return the JWT token as part of the response
-//            return ResponseEntity.ok("Bearer " + token);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
-//        }
-//    }
-
-
-
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, Object>> logout(@RequestHeader("Authorization") String token) {
         try {
             // Call the logout method from AuthService to handle token blacklisting
             authService.logout(token);
-            return new ResponseEntity<>("Logout successful", HttpStatus.OK);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Logout successful");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
         } catch (Exception e) {
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Error: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 

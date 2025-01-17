@@ -14,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -84,19 +86,22 @@ public class JobRhController {
 
     // Update an existing job
     @PutMapping("/update/{id}")
-    public ResponseEntity<JobDto> updateJob(@PathVariable Long id, @RequestBody Job job, Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> updateJob(@PathVariable Long id, @RequestBody Job job, Authentication authentication) {
+        try{
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         RH rh = customUserDetails.getRh();
-
         Job existingJob = jobRepository.findByIdAndRh(id, rh); // Find the job by ID and RH
         if (existingJob == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Job not found");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
 
         if (!"Created".equals(existingJob.getStatus())) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // Only allow update if status is "Created"
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Job not Status Created");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN); // Only allow update if status is "Created"
         }
-
         // Update job fields as needed
         existingJob.setTitle(job.getTitle());
         existingJob.setCategory(job.getCategory());
@@ -114,7 +119,18 @@ public class JobRhController {
 
         Job updatedJob = jobRepository.save(existingJob); // Save the updated job
         JobDto jobDto = new JobDto(updatedJob);
-        return new ResponseEntity<>(jobDto, HttpStatus.OK);
+
+        //return new ResponseEntity<>(jobDto, HttpStatus.OK);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Job updated successfully");
+        response.put("job", jobDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    } catch (Exception e) {
+        // Handle any unexpected errors
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Error: " + e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
     }
     @PutMapping(value = "/post/{id}")
     public ResponseEntity<JobDto> postJob(@PathVariable Long id, Authentication authentication) {
@@ -146,9 +162,6 @@ public class JobRhController {
                 // Return a bad request if the job status is not "Created"
                 return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             }
-   //     } catch (Exception e) {
-   //         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-   //     }
     }
 
     // Delete a job

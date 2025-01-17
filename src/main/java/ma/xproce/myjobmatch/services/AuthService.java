@@ -72,23 +72,23 @@ public class AuthService {
     public void logout(String token) {
         // Extract token expiration
         Date expiryDate = jwtUtil.extractExpiration(token);
-
         // Save token to blacklist
         TokenBlacklist blacklistedToken = new TokenBlacklist();
         blacklistedToken.setToken(token);
         blacklistedToken.setExpiryDate(expiryDate);
         tokenBlacklistRepository.save(blacklistedToken);
-
         // Clear security context
         SecurityContextHolder.clearContext();
     }
+
+
     public boolean isProfileComplete(CustomUserDetails customUserDetails) {
         if (customUserDetails.getRh() != null) {
             RH rh = customUserDetails.getRh();
             return rh.getCompanyName() != null && !rh.getCompanyName().isEmpty();
         } else if (customUserDetails.getCandidate() != null) {
             Candidate candidate = customUserDetails.getCandidate();
-            return candidate.getEmail() != null && !candidate.getEmail().isEmpty();
+            return candidate.getLinkedinUrl() != null && !candidate.getLinkedinUrl().isEmpty();
         }
         return false;
     }

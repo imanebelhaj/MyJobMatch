@@ -62,14 +62,13 @@ public class RhController {
     public ResponseEntity<RhProfileDto> viewProfile(Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         Long rhId = customUserDetails.getRh().getId();
-
         RhProfileDto rhProfileDto = rhService.getProfileById(rhId);
-
         return ResponseEntity.ok(rhProfileDto);
     }
 
     @PutMapping("/edit-profile")
-    public ResponseEntity<String> editProfile(@RequestBody RhProfileDto rhProfileDto, Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> editProfile(@RequestBody RhProfileDto rhProfileDto, Authentication authentication) {
+        try {
         // Get the authenticated RH ID from CustomUserDetails
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         Long rhId = customUserDetails.getRh().getId();
@@ -77,7 +76,16 @@ public class RhController {
         // Delegate the update logic to the RhService
         rhService.updateProfile(rhId, rhProfileDto);
 
-        return ResponseEntity.ok("Profile edited successfully");
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Profile updated successfully");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            // Return error message in case of exception
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Error: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
 

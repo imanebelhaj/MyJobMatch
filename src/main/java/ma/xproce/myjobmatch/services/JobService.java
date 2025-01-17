@@ -5,9 +5,16 @@ import ma.xproce.myjobmatch.dao.entities.Job;
 import ma.xproce.myjobmatch.dao.entities.RH;
 import ma.xproce.myjobmatch.dao.repositories.JobRepository;
 import ma.xproce.myjobmatch.dto.JobDto;
+import ma.xproce.myjobmatch.dto.JobMatchResponse;
 import ma.xproce.myjobmatch.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
 import java.util.List;
@@ -16,8 +23,37 @@ import java.util.List;
 @Transactional
 public class JobService {
 
+
+    @Value("${flask.api.url}")
+    private String flaskApiUrl;
+
+    private final RestTemplate restTemplate;
+
+    public JobService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
     @Autowired
     private JobRepository jobRepository;
+
+    public List<String> getMatchedJobs(String resumeText) {
+        // Construct request body as JSON
+        String requestBody = "{\"resume_text\": \"" + resumeText + "\"}";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        // Make a POST request to Flask API to get matched jobs
+        ResponseEntity<JobMatchResponse> response = restTemplate.exchange(
+                flaskApiUrl + "/match-jobs",
+                HttpMethod.POST,
+                entity,
+                JobMatchResponse.class
+        );
+
+        return response.getBody().getMatchedJobs();
+    }
 
     public Job createJob(Job job) {
         job.setCreatedAt(new Date());

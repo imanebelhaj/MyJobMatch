@@ -4,7 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import ma.xproce.myjobmatch.dao.entities.Candidate;
 import ma.xproce.myjobmatch.dao.entities.RH;
+import ma.xproce.myjobmatch.dao.repositories.CandidateRepository;
 import ma.xproce.myjobmatch.dao.repositories.RHRepository;
 import ma.xproce.myjobmatch.utils.CustomUserDetailsService;
 import ma.xproce.myjobmatch.utils.JwtUtil;
@@ -28,15 +30,17 @@ public class UsernamePasswordAuthFilter  extends UsernamePasswordAuthenticationF
     private final CustomUserDetailsService customUserDetailsService;
     //@Autowired
     private final RHRepository rhRepository;
+    private final CandidateRepository candidateRepository;
 
 
     public UsernamePasswordAuthFilter(AuthenticationManager authenticationManager,
                                       JwtUtil jwtUtil,
-                                      CustomUserDetailsService customUserDetailsService, RHRepository rhRepository) {
+                                      CustomUserDetailsService customUserDetailsService, RHRepository rhRepository,CandidateRepository candidateRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.customUserDetailsService = customUserDetailsService;
         this.rhRepository = rhRepository;
+        this.candidateRepository = candidateRepository;
         setFilterProcessesUrl("/api/auth/login"); // URL for the login endpoint
     }
     @Override
@@ -77,6 +81,18 @@ public class UsernamePasswordAuthFilter  extends UsernamePasswordAuthenticationF
                 response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
                 response.setHeader("Location", "/api/rh/complete-profile");  // Adjust the redirect URL if needed
                 return;
+            }
+        } else if (userDetails instanceof Candidate) {
+            Candidate candidate = (Candidate) userDetails;
+            Candidate candidateFromDb = candidateRepository.findByUsername(candidate.getUsername())
+                    .orElseThrow(() -> new RuntimeException("Candidate not found"));
+
+            // If the profile is not complete, redirect to the profile completion page
+            if (!candidateFromDb.isProfileComplete()) {
+                response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
+                response.setHeader("Location", "/api/candidate/complete-profile");  // Adjust the redirect URL if needed
+                return;
+
             }
         }
         chain.doFilter(request, response);

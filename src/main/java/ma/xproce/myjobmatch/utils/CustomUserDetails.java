@@ -20,12 +20,13 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
+
     public RH getRh() {
        // if (user.getRole().getRole().equals("RH")) {
         if (user instanceof RH) {
             return (RH) user; // Cast to RH if the user is an instance of RH
         }
-        throw new ClassCastException("User is not of type RH");
+        return null;
     }
 
     public Candidate getCandidate() {

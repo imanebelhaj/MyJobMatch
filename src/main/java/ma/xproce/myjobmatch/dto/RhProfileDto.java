@@ -13,6 +13,8 @@ import java.util.List;
 public class RhProfileDto {
     private String companyName;
     private String fullName;
+    private String email;
+    private String username;
     private String linkedinUrl;
     private String department;
     private String phone;
@@ -100,6 +102,12 @@ public class RhProfileDto {
         isProfileComplete = profileComplete;
     }
 
+    public String getEmail(){ return email;}
+
+    public void setEmail(String email) {this.email=email;}
+    public String getUsername(){ return username;}
+
+    public void setUsername(String username) {this.username=username;}
 
 
 }

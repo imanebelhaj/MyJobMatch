@@ -23,9 +23,6 @@ import java.util.Date;
 
 @Service
 public class AuthService {
-    //register ✅ idk if its correct tho
-    //authenticate(login)✅  same for this hihi
-    //logout
 
     @Autowired
     private UserRepository userRepository;
@@ -93,27 +90,6 @@ public class AuthService {
         return false;
     }
 
-
-
-
-
-//    public String authenticate(LoginUserDto loginUserDto) {
-//        // Authenticate the user using AuthenticationManager
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        loginUserDto.getUsername(), // Use username here
-//                        loginUserDto.getPassword()
-//                )
-//        );
-//        // If authentication is successful, generate JWT token
-//        if (authentication.isAuthenticated()) {
-//            // We use the authenticated user (UserDetails) to generate the token
-//            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-//            return jwtUtil.generateToken(userDetails); // Pass UserDetails directly to generateToken
-//        } else {
-//            throw new RuntimeException("Invalid credentials.");
-//        }
-//    }
 
 
 

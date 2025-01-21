@@ -37,6 +37,7 @@ public class Application {
     private Candidate candidate;
 
 
+
     // Getters and Setters
     public Long getId() {
         return id;

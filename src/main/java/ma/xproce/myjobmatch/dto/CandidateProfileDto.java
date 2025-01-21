@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -12,34 +13,55 @@ import java.util.List;
 @NoArgsConstructor
 public class CandidateProfileDto {
 
+    //add setters and getters
+
     private String fullName;
     private String phone;
     private String linkedinUrl;
-    private String website;
-    private String location;
     private String category;
-    private String jobType;
-    private String resumeUrl;
-    private String coverLetterUrl;
-    private String status;
-    private String profilePictureUrl;
-    private boolean isProfileComplete;
-
-    // Resume Fields
-    private String professionalSummary;
-    private String portfolioUrl;
-    private List<String> education;  // School, duration, degree
-    private List<String> experience;  // Company, title, description, etc.
-    private List<String> softSkills;
-    private List<String> hardSkills;
+    private String summary;
+    private List<String> skills;
     private List<String> languages;
-    private List<String> certifications;
-    private List<String> projects;
+    private boolean isProfileComplete;
+    private byte[] profilePicture;
+    private byte[] resumePdf;
+
+    //education feilds
+    private String school;
+    private String degree;
+    private String field;
+    private Date startDate;
+    private Date endDate;
+
+    //experience feilds
+    private String title;
+    private String company;
+    private Date jobStartDate;
+    private Date jobEndDate;
+    private String description;
+    private String type;
+
+    private List<ExperienceDto> experiences;
+    private List<EducationDto> educations;
 
 
 
 
-    // Getters and Setters
+    public List<ExperienceDto> getExperiences() {
+        return experiences;
+    }
+
+    public void setExperiences(List<ExperienceDto> experiences) {
+        this.experiences = experiences;
+    }
+
+    public List<EducationDto> getEducations() {
+        return educations;
+    }
+
+    public void setEducations(List<EducationDto> educations) {
+        this.educations = educations;
+    }
 
     public String getFullName() {
         return fullName;
@@ -65,22 +87,6 @@ public class CandidateProfileDto {
         this.linkedinUrl = linkedinUrl;
     }
 
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     public String getCategory() {
         return category;
     }
@@ -89,100 +95,20 @@ public class CandidateProfileDto {
         this.category = category;
     }
 
-    public String getJobType() {
-        return jobType;
+    public String getSummary() {
+        return summary;
     }
 
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
-    public String getResumeUrl() {
-        return resumeUrl;
+    public List<String> getSkills() {
+        return skills;
     }
 
-    public void setResumeUrl(String resumeUrl) {
-        this.resumeUrl = resumeUrl;
-    }
-
-    public String getCoverLetterUrl() {
-        return coverLetterUrl;
-    }
-
-    public void setCoverLetterUrl(String coverLetterUrl) {
-        this.coverLetterUrl = coverLetterUrl;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
-    }
-
-    public boolean isProfileComplete() {
-        return isProfileComplete;
-    }
-
-    public void setProfileComplete(boolean profileComplete) {
-        isProfileComplete = profileComplete;
-    }
-
-    public String getProfessionalSummary() {
-        return professionalSummary;
-    }
-
-    public void setProfessionalSummary(String professionalSummary) {
-        this.professionalSummary = professionalSummary;
-    }
-
-    public String getPortfolioUrl() {
-        return portfolioUrl;
-    }
-
-    public void setPortfolioUrl(String portfolioUrl) {
-        this.portfolioUrl = portfolioUrl;
-    }
-
-    public List<String> getEducation() {
-        return education;
-    }
-
-    public void setEducation(List<String> education) {
-        this.education = education;
-    }
-
-    public List<String> getExperience() {
-        return experience;
-    }
-
-    public void setExperience(List<String> experience) {
-        this.experience = experience;
-    }
-
-    public List<String> getSoftSkills() {
-        return softSkills;
-    }
-
-    public void setSoftSkills(List<String> softSkills) {
-        this.softSkills = softSkills;
-    }
-
-    public List<String> getHardSkills() {
-        return hardSkills;
-    }
-
-    public void setHardSkills(List<String> hardSkills) {
-        this.hardSkills = hardSkills;
+    public void setSkills(List<String> skills) {
+        this.skills = skills;
     }
 
     public List<String> getLanguages() {
@@ -193,19 +119,119 @@ public class CandidateProfileDto {
         this.languages = languages;
     }
 
-    public List<String> getCertifications() {
-        return certifications;
+    public boolean isProfileComplete() {
+        return isProfileComplete;
     }
 
-    public void setCertifications(List<String> certifications) {
-        this.certifications = certifications;
+    public void setProfileComplete(boolean isProfileComplete) {
+        this.isProfileComplete = isProfileComplete;
     }
 
-    public List<String> getProjects() {
-        return projects;
+    public byte[] getProfilePicture() {
+        return profilePicture;
     }
 
-    public void setProjects(List<String> projects) {
-        this.projects = projects;
+    public void setProfilePicture(byte[] profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public byte[] getResumePdf() {
+        return resumePdf;
+    }
+
+    public void setResumePdf(byte[] resumePdf) {
+        this.resumePdf = resumePdf;
+    }
+
+    // Getter and Setter methods for education fields
+
+    public String getSchool() {
+        return school;
+    }
+
+    public void setSchool(String school) {
+        this.school = school;
+    }
+
+    public String getDegree() {
+        return degree;
+    }
+
+    public void setDegree(String degree) {
+        this.degree = degree;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public void setField(String field) {
+        this.field = field;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    // Getter and Setter methods for experience fields
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public Date getJobStartDate() {
+        return jobStartDate;
+    }
+
+    public void setJobStartDate(Date jobStartDate) {
+        this.jobStartDate = jobStartDate;
+    }
+
+    public Date getJobEndDate() {
+        return jobEndDate;
+    }
+
+    public void setJobEndDate(Date jobEndDate) {
+        this.jobEndDate = jobEndDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

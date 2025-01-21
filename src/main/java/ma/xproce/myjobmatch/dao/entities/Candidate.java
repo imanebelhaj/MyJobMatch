@@ -1,6 +1,5 @@
 package ma.xproce.myjobmatch.dao.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -12,45 +11,48 @@ import java.util.List;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @Table(name = "candidates")
-public class Candidate extends User{
+public class Candidate extends User {
 
     private String fullName;
     private String phone;
     private String linkedinUrl;
-    private String website;
-    private String location; //country+city
-    private String category; //field of expertise
-    private String jobType; //contact type : intern, full time, part-time , freelance... (opt)
+    private String category;
+    private String summary;
 
-    @Column(nullable = true)
-    private String resumeUrl;
+    @Lob
+    private byte[] profilePicture;
 
-    @Column(nullable = true)
-    private String coverLetterUrl;
-    private String status; //(opt) (looking for a job, employed)?
-
-    @Column(nullable = true)
-    private String profilePictureUrl;
+    @Lob
+    private byte[] resumePdf;
 
     @Column(nullable = false)
     private boolean isProfileComplete = false;
 
-    //list of jobs applied to: filter jobs by candidateApplicationStatus if true(aaplied) or false
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Application> applications;
 
-    @OneToOne
-    @JoinColumn(name = "resume_id")
-    private Resume resume;
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Experience> experiences;
 
-    public boolean isProfileComplete() {
-        return isProfileComplete;
-    }
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Education> educations;
 
-    public void setProfileComplete(boolean profileComplete) {
-        isProfileComplete = profileComplete;
-    }
+    @ElementCollection
+    private List<String> skills;
+
+    @ElementCollection
+    private List<String> languages;
+
+    @Column(columnDefinition = "TEXT")
+    private String resumeForm; // Concatenated form of all fields
+
+
+
+
+
 
     // Getters and Setters
 
@@ -78,22 +80,6 @@ public class Candidate extends User{
         this.linkedinUrl = linkedinUrl;
     }
 
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     public String getCategory() {
         return category;
     }
@@ -102,46 +88,21 @@ public class Candidate extends User{
         this.category = category;
     }
 
-    public String getJobType() {
-        return jobType;
+    public String getSummary() {
+        return summary;
     }
 
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
-    public String getResumeUrl() {
-        return resumeUrl;
+    public boolean isProfileComplete() {
+        return isProfileComplete;
     }
 
-    public void setResumeUrl(String resumeUrl) {
-        this.resumeUrl = resumeUrl;
+    public void setProfileComplete(boolean profileComplete) {
+        isProfileComplete = profileComplete;
     }
-
-    public String getCoverLetterUrl() {
-        return coverLetterUrl;
-    }
-
-    public void setCoverLetterUrl(String coverLetterUrl) {
-        this.coverLetterUrl = coverLetterUrl;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
-    }
-
 
     public List<Application> getApplications() {
         return applications;
@@ -151,13 +112,59 @@ public class Candidate extends User{
         this.applications = applications;
     }
 
-    public Resume getResume() {
-        return resume;
+    public byte[] getProfilePicture() {
+        return profilePicture;
     }
 
-    public void setResume(Resume resume) {
-        this.resume = resume;
+    public void setProfilePicture(byte[] profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
+    public byte[] getResumePdf() {
+        return resumePdf;
+    }
 
+    public void setResumePdf(byte[] resumePdf) {
+        this.resumePdf = resumePdf;
+    }
+
+    public List<Experience> getExperiences() {
+        return experiences;
+    }
+
+    public void setExperiences(List<Experience> experiences) {
+        this.experiences = experiences;
+    }
+
+    public List<Education> getEducations() {
+        return educations;
+    }
+
+    public void setEducations(List<Education> educations) {
+        this.educations = educations;
+    }
+
+    public List<String> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(List<String> skills) {
+        this.skills = skills;
+    }
+
+    public List<String> getLanguages() {
+        return languages;
+    }
+
+    public void setLanguages(List<String> languages) {
+        this.languages = languages;
+    }
+
+    public String getResumeForm() {
+        return resumeForm;
+    }
+
+    public void setResumeForm(String resumeForm) {
+        this.resumeForm = resumeForm;
+    }
 }

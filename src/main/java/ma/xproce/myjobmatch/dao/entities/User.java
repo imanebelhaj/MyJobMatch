@@ -37,12 +37,6 @@ public class User {
     @Column(nullable = false)
     private boolean isProfileComplete = false;
 
-//    @Column(name = "verification_code")
-//    private String verificationCode;
-//
-//    @Column(name = "verification_expiration")
-//    private LocalDateTime verificationCodeExpiresAt;
-//    private boolean enabled;
 
     @ManyToOne //(fetch = FetchType.EAGER) //@Fetch(FetchMode.JOIN)
     @JoinColumn(name = "role", nullable = false)

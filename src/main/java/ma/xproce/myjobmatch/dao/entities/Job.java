@@ -29,6 +29,8 @@ public class Job {
     private Date postedAt;
     private int maxApplications;
     private String status; //("Open", "Closed", "Filled", whether the job is still accepting applications)
+    @Column(columnDefinition = "LONGTEXT")
+    private String jobForm;
 
     //extra
     private String jobType;
@@ -60,6 +62,12 @@ public class Job {
         this.id = id;
     }
 
+    public void setJobForm(String jobForm) {
+        this.jobForm = jobForm;
+    }
+    public String getJobForm() {
+        return jobForm;
+    }
     public String getTitle() {
         return title;
     }

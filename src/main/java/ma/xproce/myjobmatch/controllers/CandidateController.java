@@ -9,10 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +25,30 @@ public class CandidateController {
 
     @Autowired
     CandidateService candidateService;
+    @PutMapping("/first-page")
+    public ResponseEntity<Map<String, Object>> firstPage(@RequestBody CandidateProfileDto candidateProfileDto, Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long candidateId = customUserDetails.getCandidate().getId();
+            Candidate candidate = candidateRepository.findById(candidateId)
+                    .orElseThrow(() -> new RuntimeException("Candidate not found with ID: " + candidateId));
+
+            if (candidateProfileDto.getResumePdf() != null) {
+                candidate.setResumePdf(candidateProfileDto.getResumePdf());
+                response.put("message", "Resume uploaded and profile updated successfully.");
+            } else {
+                response.put("message", "No resume uploaded.");
+            }
+
+            candidateRepository.save(candidate);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            response.put("message", "Error: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PutMapping("/complete-profile")
     public ResponseEntity<Map<String, Object>> completeProfile(@RequestBody CandidateProfileDto candidateProfileDto, Authentication authentication) {
@@ -66,10 +88,21 @@ public class CandidateController {
     }
 
     @PutMapping("/edit-profile")
-    public ResponseEntity<String> editProfile(@RequestBody CandidateProfileDto candidateProfileDto, Authentication authentication) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long candidateId = customUserDetails.getCandidate().getId();
-        candidateService.updateProfile(candidateId, candidateProfileDto);
-        return ResponseEntity.ok("Profile edited successfully");
+    public ResponseEntity<Map<String, Object>> editProfile(@RequestBody CandidateProfileDto candidateProfileDto, Authentication authentication) {
+        try {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long candidateId = customUserDetails.getCandidate().getId();
+            candidateService.updateProfile(candidateId, candidateProfileDto);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Profile updated successfully");
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            // Return error message in case of exception
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Error: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 }

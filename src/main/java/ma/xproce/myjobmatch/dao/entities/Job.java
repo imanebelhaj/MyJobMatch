@@ -36,8 +36,8 @@ public class Job {
     private String jobType;
     private String salaryRange;
     private String RequiredEducation;
-    private String RequiredExperience; // e.g., "2-5 years of experience"
-    private String jobLevel; //(e.g., "Junior", "Senior", "Lead")
+    private String RequiredExperience; // "2-5 years of experience"
+    private String jobLevel; //"Junior", "Senior", "Lead")
     @ElementCollection
     @CollectionTable(name = "job_required_skills", joinColumns = @JoinColumn(name = "job_id"))
     private List<String> RequiredSkills;

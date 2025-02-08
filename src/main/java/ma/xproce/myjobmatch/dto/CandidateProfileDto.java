@@ -17,6 +17,8 @@ public class CandidateProfileDto {
 
     private String fullName;
     private String phone;
+    private String email;
+    private String username;
     private String linkedinUrl;
     private String category;
     private String summary;
@@ -233,5 +235,21 @@ public class CandidateProfileDto {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

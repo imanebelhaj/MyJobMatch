@@ -3,6 +3,7 @@ package ma.xproce.myjobmatch.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ma.xproce.myjobmatch.dao.entities.Job;
 import ma.xproce.myjobmatch.dao.repositories.JobRepository;
+import ma.xproce.myjobmatch.dto.ApplicationDto;
 import ma.xproce.myjobmatch.dto.JobDto;
 import ma.xproce.myjobmatch.services.JobService;
 import ma.xproce.myjobmatch.utils.CustomUserDetails;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.web.client.RestTemplate;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,34 +29,28 @@ public class JobController {
     @Autowired
     JobService jobService;
 
-    @GetMapping
-    public ResponseEntity<List<JobDto>> getAllJobs(Authentication authentication) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        List<Job> jobs = jobService.getAllJobs();
-        List<JobDto> jobDtos = jobs.stream()
-                .map(ma.xproce.myjobmatch.dto.JobDto::new)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(jobDtos, HttpStatus.OK);
+    @GetMapping("/hasApplied/{jobId}")
+    public ResponseEntity<Boolean> hasApplied(@PathVariable Long jobId, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long candidateId = userDetails.getCandidate().getId();
+
+        boolean hasApplied = jobService.hasApplied(jobId, candidateId);
+        return ResponseEntity.ok(hasApplied);
     }
-//    @GetMapping("/matched-jobs")
-//    public ResponseEntity<Map<String, Object>> getMatchedJobs(Authentication authentication) {
-//        try {
-//            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//            String resumeForm = userDetails.getCandidate().getResumeForm();
-//            System.out.println("🤖");
-//            List<Job> matchedJobs = jobService.getMatchedJobs(resumeForm);
-//            System.out.println("💗💗💗🤖🤖");
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("matchedJobs", matchedJobs);
-//
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(Map.of("error", e.getMessage()));
-//        }
-//    }
 
 
+@GetMapping("/allJobs")
+public ResponseEntity<List<JobDto>> getAllJobs(Authentication authentication) {
+    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    List<Job> jobs = jobService.getAllJobs();
+    if (jobs.isEmpty()) {
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    List<JobDto> jobDtos = jobs.stream()
+            .map(JobDto::new)
+            .collect(Collectors.toList());
+    return new ResponseEntity<>(jobDtos, HttpStatus.OK);
+}
 
 
     @GetMapping("/matched-jobs")
@@ -98,6 +94,63 @@ public class JobController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
+    @GetMapping("/matched-jobs-2")
+    public ResponseEntity<List<JobDto>> getMatchedJobs2(Authentication authentication) {
+        try {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String resumeForm = userDetails.getCandidate().getResumeForm();
+
+            // Log the received resume text
+            System.out.println("Received resume text: " + resumeForm);
+
+            // Escape special characters for JSON
+            String escapedResumeForm = StringEscapeUtils.escapeJson(resumeForm);
+
+            // Log the escaped resume text
+            System.out.println("Escaped resume text: " + escapedResumeForm);
+
+            // Send the POST request to Flask API
+            String flaskApiUrl = "http://localhost:5000/match-jobs";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("resume_text", escapedResumeForm);
+
+            HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> flaskResponse = restTemplate.exchange(flaskApiUrl, HttpMethod.POST, request, String.class);
+
+            // Log the response from Flask API
+            System.out.println("Flask API response: " + flaskResponse.getBody());
+
+            // Convert the JSON response to extract matched job IDs (as Long)
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> responseMap = objectMapper.readValue(flaskResponse.getBody(), Map.class);
+            List<Long> matchedJobIds = (List<Long>) responseMap.get("matched_jobs");
+
+            // Fetch Job entities based on the matched job IDs
+            List<Job> matchedJobs = jobRepository.findAllById(matchedJobIds);
+
+            List<JobDto> matchedJobDtos = matchedJobs.stream()
+                    .map(ma.xproce.myjobmatch.dto.JobDto::new)
+                    .collect(Collectors.toList());
+            // Convert Job entities to JobDto using the JobMapper
+            //List<JobDto> matchedJobDtos = JobMapper.fromJobListToJobDtoList(matchedJobs);
+
+            return ResponseEntity.ok(matchedJobDtos);
+
+        } catch (Exception e) {
+            // Log the error
+            System.err.println("Error in matching jobs: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
 
 
 

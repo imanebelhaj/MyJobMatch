@@ -90,7 +90,7 @@ public class UsernamePasswordAuthFilter  extends UsernamePasswordAuthenticationF
             // If the profile is not complete, redirect to the profile completion page
             if (!candidateFromDb.isProfileComplete()) {
                 response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
-                response.setHeader("Location", "/api/candidate/complete-profile");  // Adjust the redirect URL if needed
+                response.setHeader("Location", "/api/candidate/first-page");  // Adjust the redirect URL if needed
                 return;
 
             }

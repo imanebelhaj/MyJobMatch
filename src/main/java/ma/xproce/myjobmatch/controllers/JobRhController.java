@@ -44,8 +44,7 @@ public class JobRhController {
         try {
             Job savedJob = jobService.createJob(job);
             JobDto jobDTO = new JobDto(savedJob);
-            System.out.println(savedJob); // Log the saved job object
-            System.out.println("💗💗💗💗💗💗");
+            System.out.println(savedJob);
             return new ResponseEntity<>(jobDTO, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

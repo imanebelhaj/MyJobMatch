@@ -12,6 +12,9 @@ import java.util.List;
 @ToString(callSuper = true)
 @Table(name = "candidates")
 public class Candidate extends User {
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<Application> applications;
 
     private String fullName;
     private String phone;
@@ -28,9 +31,7 @@ public class Candidate extends User {
     @Column(nullable = false)
     private boolean isProfileComplete = false;
 
-    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    private List<Application> applications;
+
 
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

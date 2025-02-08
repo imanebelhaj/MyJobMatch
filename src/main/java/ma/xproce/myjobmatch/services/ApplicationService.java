@@ -22,7 +22,6 @@ public class ApplicationService {
         // If an existing application is found, throw an exception or return a specific result
         Application existingApplication = applicationRepository.findByCandidateAndJob(candidate, job);
         if (existingApplication != null) {
-            System.out.println("💗💗💗💗💗💗");// just for testing
             throw new IllegalArgumentException("You have already applied to this job.");
         }
         Application application = new Application();
@@ -33,9 +32,9 @@ public class ApplicationService {
         application.setCreatedAt(new java.util.Date());
         application.setEditedAt(new java.util.Date());
 
-        // Save and return the application
         return applicationRepository.save(application);
     }
+
 
     // Get Applications by Candidate ID
     public List<Application> getApplicationsByCandidate(Candidate candidate) {

@@ -8,6 +8,8 @@ public class ApplicationDto {
     private Long candidateId;
     private Long jobId;
 
+    private JobDto jobDto;
+
     private String status; //(Pending, Accepted, Rejected)
     private Date applicationDate;
     private Date createdAt;
@@ -20,10 +22,20 @@ public class ApplicationDto {
         this.applicationDate = application.getApplicationDate();
         this.createdAt = application.getCreatedAt();
         this.editedAt = application.getEditedAt();
+        this.jobDto = new JobDto(application.getJob()); // Mapping Job entity to JobDto
+
     }
 
 
     // Getters and setters
+
+    public JobDto getJobDto() {
+        return jobDto;
+    }
+
+    public void setJobDto(JobDto jobDto) {
+        this.jobDto = jobDto;
+    }
 
     public Long getCandidateId() {
         return candidateId;

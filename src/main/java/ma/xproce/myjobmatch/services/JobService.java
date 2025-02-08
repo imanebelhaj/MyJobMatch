@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import ma.xproce.myjobmatch.dao.entities.Candidate;
 import ma.xproce.myjobmatch.dao.entities.Job;
 import ma.xproce.myjobmatch.dao.entities.RH;
+import ma.xproce.myjobmatch.dao.repositories.ApplicationRepository;
 import ma.xproce.myjobmatch.dao.repositories.JobRepository;
 import ma.xproce.myjobmatch.dto.JobDto;
 import ma.xproce.myjobmatch.dto.JobMatchResponse;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,9 +30,16 @@ public class JobService {
     @Autowired
     private JobRepository jobRepository;
 
-    @Value("${flask.api.url}") //@Value("${flask.api.url:http://default-value/api}")
+    @Value("${flask.api.url}")
     private String flaskApiUrl;
     private final RestTemplate restTemplate;
+
+    @Autowired
+    private ApplicationRepository applicationRepository;
+
+    public boolean hasApplied(Long jobId, Long candidateId) {
+        return applicationRepository.existsByJobIdAndCandidateId(jobId, candidateId);
+    }
 
     public JobService(RestTemplate restTemplate, JobRepository jobRepository) {
         this.restTemplate = restTemplate;
@@ -71,35 +80,23 @@ public class JobService {
     }
 
 
-//    public List<Job> getMatchedJobs(String resumeText) {
-//        // Prepare request body for Flask API
-//        String requestBody = "{\"resume_text\": \"" + resumeText + "\"}";
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Content-Type", "application/json");
-//        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-//
-//        // Call Flask API
-//        ResponseEntity<JobMatchResponse> response = restTemplate.exchange(
-//                flaskApiUrl + "/match-jobs",
-//                HttpMethod.POST,
-//                entity,
-//                JobMatchResponse.class
-//        );
-//
-//        // Get matched job IDs from Flask response
-//        List<String> matchedJobIdsAsStrings = response.getBody().getMatchedJobs();
-//
-//        // Convert String IDs to Long IDs
-//        List<Long> matchedJobIds = matchedJobIdsAsStrings.stream()
-//                .map(Long::valueOf)
-//                .toList();
-//
-//        // Fetch job details from the database
-//        return jobRepository.findByIdIn(matchedJobIds);
-//    }
+    @Scheduled(fixedRate = 60000)  // Check every minute (60000ms)
+    public void checkAndCompleteJobs() {
+        List<Job> jobs = jobRepository.findAll();
+        for (Job job : jobs) {
+            isJobComplete(job);  // Check if the job should be marked as completed
+        }
+    }
 
-
-
+    public void isJobComplete(Job job) {
+        // Check if the max applications have been reached
+        long applicationsCount = applicationRepository.countByJobId(job.getId());
+        if (applicationsCount >= job.getMaxApplications() || new Date().after(job.getApplicationDeadline())) {
+            job.setStatus("Completed");
+            jobRepository.save(job);  // Update the job status
+        }
+    }
+    
 
     public Job createJob(Job job) {
         job.setCreatedAt(new Date());

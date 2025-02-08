@@ -21,6 +21,7 @@ public class Application {
     private Date applicationDate;
     private Date createdAt;
     private Date editedAt;
+    private byte coverLetter;
 
     // HR review fields
     private Date reviewedAt;  // When the application was reviewed
@@ -46,6 +47,9 @@ public class Application {
     public void setId(Long id) {
         this.id = id;
     }
+    public byte getCoverLetter(){return coverLetter;}
+
+    public void setCoverLetter(byte coverLetter) {this.coverLetter = coverLetter;}
 
     public String getStatus() {
         return status;

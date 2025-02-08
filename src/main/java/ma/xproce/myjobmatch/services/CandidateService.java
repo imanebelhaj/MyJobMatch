@@ -33,6 +33,8 @@ public class CandidateService {
 
         // Set basic information from Candidate entity
         profileDto.setFullName(candidate.getFullName());
+        profileDto.setEmail(candidate.getEmail());
+        profileDto.setUsername(candidate.getUsername());
         profileDto.setPhone(candidate.getPhone());
         profileDto.setLinkedinUrl(candidate.getLinkedinUrl());
         profileDto.setCategory(candidate.getCategory());
@@ -193,7 +195,6 @@ public class CandidateService {
         }
 
         updateResumeForm(candidate);
-        // ResumeForm will be updated automatically due to @PreUpdate
         return candidateRepository.save(candidate);
     }
 

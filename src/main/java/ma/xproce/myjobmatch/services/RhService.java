@@ -16,13 +16,6 @@ public class RhService {
     @Autowired
     private RHRepository rhRepository;
 
-
-//    @Transactional(readOnly = true)
-//    public RH getProfileById(Long rhId) {
-//        return rhRepository.findById(rhId)
-//                .orElseThrow(() -> new RuntimeException("RH not found"));
-//    }
-
     public RhProfileDto getProfileById(Long rhId) {
         RH rh = rhRepository.findById(rhId)
                 .orElseThrow(() -> new RuntimeException("RH not found"));

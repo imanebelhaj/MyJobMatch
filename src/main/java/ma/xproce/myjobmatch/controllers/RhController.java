@@ -72,8 +72,6 @@ public class RhController {
         // Get the authenticated RH ID from CustomUserDetails
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         Long rhId = customUserDetails.getRh().getId();
-
-        // Delegate the update logic to the RhService
         rhService.updateProfile(rhId, rhProfileDto);
 
         Map<String, Object> response = new HashMap<>();

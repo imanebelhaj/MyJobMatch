@@ -62,6 +62,9 @@ public class JobDto {
     @JsonProperty("rhName")
     private String rhName;
 
+    @JsonProperty("company")
+    private String company;
+
     public JobDto(Job job) {
         this.id = job.getId();
         this.title = job.getTitle();
@@ -80,7 +83,9 @@ public class JobDto {
         this.requiredExperience = job.getRequiredExperience();
         this.jobLevel = job.getJobLevel();
         this.requiredSkills = job.getRequiredSkills();
-        this.rhName = job.getRh() != null ? job.getRh().getFullName() : null; // Safely retrieve RH name
+        this.rhName = job.getRh() != null ? job.getRh().getFullName() : null;
+        this.company = job.getRh() != null ? job.getRh().getCompanyName() : null;
+
     }
 
 }

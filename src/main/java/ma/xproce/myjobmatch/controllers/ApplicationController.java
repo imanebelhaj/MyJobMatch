@@ -31,10 +31,9 @@ public class ApplicationController {
     private ApplicationService applicationService;
 
     @Autowired
-    private CandidateService candidateService;
-
-    @Autowired
     private JobService jobService;
+
+
 
 
     @PostMapping("/candidate/apply/{jobId}")
@@ -62,13 +61,13 @@ public class ApplicationController {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         Candidate candidate = customUserDetails.getCandidate();
         List<Application> applications = applicationService.getApplicationsByCandidate(candidate);
-        //List<Application> applications = candidate.getApplications();
-
+//        Job job = jobService.getJobById(applications.getJob().getId());
         List<ApplicationDto> ApplicationDto = applications.stream()
                 .map(ma.xproce.myjobmatch.dto.ApplicationDto::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ApplicationDto);
     }
+    
 
     // 3. Get Applications by Job ID
     @GetMapping("/rh/{jobId}")

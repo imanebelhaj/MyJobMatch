@@ -4,6 +4,7 @@ package ma.xproce.myjobmatch.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ma.xproce.myjobmatch.dao.entities.Candidate;
 
 import java.util.Date;
 import java.util.List;
@@ -25,8 +26,9 @@ public class CandidateProfileDto {
     private List<String> skills;
     private List<String> languages;
     private boolean isProfileComplete;
-    private byte[] profilePicture;
+    private String profilePicture;
     private byte[] resumePdf;
+    private String resumeForm;
 
     //education feilds
     private String school;
@@ -45,6 +47,7 @@ public class CandidateProfileDto {
 
     private List<ExperienceDto> experiences;
     private List<EducationDto> educations;
+
 
 
 
@@ -71,6 +74,10 @@ public class CandidateProfileDto {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getResumeForm(){
+        return resumeForm;
     }
 
     public String getPhone() {
@@ -129,11 +136,11 @@ public class CandidateProfileDto {
         this.isProfileComplete = isProfileComplete;
     }
 
-    public byte[] getProfilePicture() {
+    public String getProfilePicture() {
         return profilePicture;
     }
 
-    public void setProfilePicture(byte[] profilePicture) {
+    public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
     }
 

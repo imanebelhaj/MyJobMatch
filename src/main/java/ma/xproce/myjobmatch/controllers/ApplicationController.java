@@ -25,15 +25,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/applications")
 public class ApplicationController {
-
-
     @Autowired
     private ApplicationService applicationService;
 
     @Autowired
     private JobService jobService;
-
-
 
 
     @PostMapping("/candidate/apply/{jobId}")
@@ -71,11 +67,11 @@ public class ApplicationController {
 
     // 3. Get Applications by Job ID
     @GetMapping("/rh/{jobId}")
-    @PreAuthorize("hasAuthority('RH')")
+    @Transactional
+//    @PreAuthorize("hasAuthority('RH')")
     public ResponseEntity<List<ApplicationDto>> getApplicationsByJob(@PathVariable Long jobId,Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         List<Application> applications = applicationService.getApplicationsByJob(jobId);
-
         List<ApplicationDto> ApplicationDto = applications.stream()
                 .map(ma.xproce.myjobmatch.dto.ApplicationDto::new)
                 .collect(Collectors.toList());

@@ -1,5 +1,6 @@
 package ma.xproce.myjobmatch.dto;
 
+import ma.xproce.myjobmatch.Mapper.DtoMapper;
 import ma.xproce.myjobmatch.dao.entities.Application;
 
 import java.util.Date;
@@ -9,6 +10,8 @@ public class ApplicationDto {
     private Long jobId;
 
     private JobDto jobDto;
+
+    private CandidateProfileDto candidateProfileDto;
 
     private String status; //(Pending, Accepted, Rejected)
     private Date applicationDate;
@@ -23,6 +26,9 @@ public class ApplicationDto {
         this.createdAt = application.getCreatedAt();
         this.editedAt = application.getEditedAt();
         this.jobDto = new JobDto(application.getJob()); // Mapping Job entity to JobDto
+       // this.candidateProfileDto = new CandidateProfileDto(application.getCandidate());
+        this.candidateProfileDto = DtoMapper.mapToCandidateProfileDto(application.getCandidate());
+
 
     }
 
@@ -35,6 +41,14 @@ public class ApplicationDto {
 
     public void setJobDto(JobDto jobDto) {
         this.jobDto = jobDto;
+    }
+
+    public CandidateProfileDto getCandidateProfileDto() {
+        return candidateProfileDto;
+    }
+
+    public void setCandidateProfileDto(CandidateProfileDto candidateProfileDto) {
+        this.candidateProfileDto = candidateProfileDto;
     }
 
     public Long getCandidateId() {

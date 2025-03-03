@@ -3,6 +3,7 @@ package ma.xproce.myjobmatch.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ma.xproce.myjobmatch.dao.entities.Experience;
 
 import java.util.Date;
 
@@ -30,6 +31,19 @@ public class ExperienceDto {
     // Default constructor
     public ExperienceDto() {
     }
+
+    public ExperienceDto(Experience experience) {
+        if (experience != null) {
+            this.title = experience.getTitle();
+            this.company = experience.getCompany();
+            this.startDate = experience.getStartDate();
+            this.endDate = experience.getEndDate();
+            this.description = experience.getDescription();
+            this.type = experience.getType();
+        }
+    }
+
+
 
     // Getters and Setters
     public String getTitle() {

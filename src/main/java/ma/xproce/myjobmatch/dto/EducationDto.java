@@ -3,6 +3,7 @@ package ma.xproce.myjobmatch.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ma.xproce.myjobmatch.dao.entities.Education;
 
 import java.util.Date;
 
@@ -29,6 +30,16 @@ public class EducationDto {
     // Default constructor
     public EducationDto() {
     }
+    public EducationDto(Education education) {
+        if (education != null) {
+            this.school = education.getSchool();
+            this.degree = education.getDegree();
+            this.field = education.getField();
+            this.startDate = education.getStartDate();
+            this.endDate = education.getEndDate();
+        }
+    }
+
 
     // Getters and Setters
     public String getSchool() {

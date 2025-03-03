@@ -23,9 +23,10 @@ public class Candidate extends User {
     private String summary;
 
     @Lob
-    private byte[] profilePicture;
+    private String profilePicture;
 
     @Lob
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] resumePdf;
 
     @Column(nullable = false)
@@ -113,11 +114,11 @@ public class Candidate extends User {
         this.applications = applications;
     }
 
-    public byte[] getProfilePicture() {
+    public String getProfilePicture() {
         return profilePicture;
     }
 
-    public void setProfilePicture(byte[] profilePicture) {
+    public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
     }
 
@@ -168,4 +169,6 @@ public class Candidate extends User {
     public void setResumeForm(String resumeForm) {
         this.resumeForm = resumeForm;
     }
+
+
 }
